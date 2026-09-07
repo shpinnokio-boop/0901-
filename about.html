@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="강아지의 소개 페이지입니다.">
+  <title>소개 | 강아지</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">본문으로 바로가기</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="logo" href="index.html" aria-label="강아지 프로필 홈">HY.</a>
+      <button class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="main-menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="main-menu" class="main-nav" aria-label="주요 메뉴">
+        <a href="index.html">홈</a>
+        <a class="active" href="about.html" aria-current="page">소개</a>
+        <a href="strength.html">강점</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main-content" class="subpage-main">
+    <section id="about" class="section about-section" aria-labelledby="about-title">
+      <div class="container two-column">
+        <div class="section-heading">
+          <p class="section-number">01</p>
+          <p class="eyebrow">ABOUT ME</p>
+          <h1 id="about-title">꾸준함으로<br>신뢰를 만듭니다.</h1>
+        </div>
+        <div class="about-copy">
+          <p class="lead">안녕하세요, 강아지입니다.</p>
+          <p>저는 작은 일도 소홀히 하지 않는 성실한 태도를 중요하게 생각합니다. 주어진 일에 꾸준히 집중하고, 끝까지 책임 있게 완성하며 신뢰를 쌓아갑니다.</p>
+          <dl class="profile-details">
+            <div><dt>이름</dt><dd>강아지</dd></div>
+            <div><dt>강점</dt><dd>성실함</dd></div>
+            <div><dt>이메일</dt><dd><a href="mailto:teaology@naver.com">teaology@naver.com</a></dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="current-year"></span> 강아지. All rights reserved.</p>
+      <a href="index.html">홈으로 <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+</body>
+</html>
