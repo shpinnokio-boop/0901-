@@ -18,3 +18,10 @@ document.querySelectorAll('.demo-form').forEach((form) => {
 const postBody = document.querySelector('#post-body');
 const charCount = document.querySelector('#char-count');
 if (postBody && charCount) postBody.addEventListener('input', () => { charCount.textContent = `${postBody.value.length}자`; });
+
+if (!document.querySelector('script[src$="js/auth.js"]')) {
+  const authScript = document.createElement('script');
+  authScript.src = 'js/auth.js';
+  authScript.defer = true;
+  document.head.appendChild(authScript);
+}
