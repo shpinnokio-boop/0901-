@@ -1,4 +1,5 @@
 const AUTH_CONFIG = Object.freeze({
+  apiVersion: '2.1.0',
   spreadsheetId: '14Mzq_UGsekSmy5IZCDn2CPE_EjVeFY_BDDn15FR4TL0',
   usersSheet: 'Users',
   sessionsSheet: 'Sessions',
@@ -41,12 +42,13 @@ function doGet() {
     return json_({
       ok: true,
       service: 'gangaji-blog-auth',
+      apiVersion: AUTH_CONFIG.apiVersion,
       ready: true,
       message: '인증 API가 실행 중입니다.',
     });
   } catch (error) {
     console.error(error && error.stack ? error.stack : error);
-    return json_({ ok: false, code: 'SETUP_FAILED', message: '인증 저장소를 준비하지 못했습니다.' });
+    return json_({ ok: false, code: 'SETUP_FAILED', apiVersion: AUTH_CONFIG.apiVersion, message: '인증 저장소를 준비하지 못했습니다.' });
   }
 }
 
@@ -64,13 +66,31 @@ function doPost(e) {
         return json_(verify_(input));
       case 'logout':
         return json_(logout_(input));
+      case 'diagnostic':
+        return json_(diagnostic_());
       default:
         return json_({ ok: false, code: 'INVALID_ACTION', message: '지원하지 않는 요청입니다.' });
     }
   } catch (error) {
     console.error(error && error.stack ? error.stack : error);
-    return json_({ ok: false, code: 'SERVER_ERROR', message: '요청을 처리하지 못했습니다.' });
+    return json_({ ok: false, code: 'SERVER_ERROR', apiVersion: AUTH_CONFIG.apiVersion, message: '요청을 처리하지 못했습니다.' });
   }
+}
+
+function diagnostic_() {
+  const spreadsheet = SpreadsheetApp.openById(AUTH_CONFIG.spreadsheetId);
+  const properties = PropertiesService.getScriptProperties();
+  return {
+    ok: true,
+    service: 'gangaji-blog-auth',
+    apiVersion: AUTH_CONFIG.apiVersion,
+    ready: Boolean(
+      spreadsheet.getSheetByName(AUTH_CONFIG.usersSheet) &&
+      spreadsheet.getSheetByName(AUTH_CONFIG.sessionsSheet) &&
+      properties.getProperty('PASSWORD_PEPPER') &&
+      properties.getProperty('TOKEN_SECRET')
+    ),
+  };
 }
 
 function signup_(input) {
