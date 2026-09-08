@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzHpUtazs4QqAbscFETrHCI1o5fsMsnyDJB4sA50878-hQD30xsX2sHBl6EUdKNdOJvOQ/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbz7imb9Bu3DFRRfAQWOk83YgxjU-Q1eukC15EKtvp3gkrz-BtqC4HMtkk-usKML55ccxQ/exec';
   const TOKEN_KEY = 'blogAuthToken';
   const USER_KEY = 'blogAuthUser';
 
