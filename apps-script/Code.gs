@@ -21,9 +21,10 @@ const SESSION_HEADERS = [
  * Users/Sessions 시트와 서버 전용 비밀값을 생성합니다.
  */
 function setupAuth() {
+  ensureAuthSetup_();
   const spreadsheet = SpreadsheetApp.openById(AUTH_CONFIG.spreadsheetId);
-  const users = ensureSheet_(spreadsheet, AUTH_CONFIG.usersSheet, USER_HEADERS);
-  const sessions = ensureSheet_(spreadsheet, AUTH_CONFIG.sessionsSheet, SESSION_HEADERS);
+  const users = spreadsheet.getSheetByName(AUTH_CONFIG.usersSheet);
+  const sessions = spreadsheet.getSheetByName(AUTH_CONFIG.sessionsSheet);
 
   users.setFrozenRows(1);
   sessions.setFrozenRows(1);
@@ -31,28 +32,27 @@ function setupAuth() {
   sessions.getRange(1, 1, 1, SESSION_HEADERS.length).setFontWeight('bold');
   users.hideColumns(4, 2); // passwordHash, salt
 
-  const properties = PropertiesService.getScriptProperties();
-  if (!properties.getProperty('PASSWORD_PEPPER')) {
-    properties.setProperty('PASSWORD_PEPPER', randomSecret_());
-  }
-  if (!properties.getProperty('TOKEN_SECRET')) {
-    properties.setProperty('TOKEN_SECRET', randomSecret_());
-  }
-
   console.log('인증 초기 설정이 완료되었습니다.');
 }
 
 function doGet() {
-  return json_({
-    ok: true,
-    service: 'gangaji-blog-auth',
-    message: '인증 API가 실행 중입니다.',
-  });
+  try {
+    ensureAuthSetup_();
+    return json_({
+      ok: true,
+      service: 'gangaji-blog-auth',
+      ready: true,
+      message: '인증 API가 실행 중입니다.',
+    });
+  } catch (error) {
+    console.error(error && error.stack ? error.stack : error);
+    return json_({ ok: false, code: 'SETUP_FAILED', message: '인증 저장소를 준비하지 못했습니다.' });
+  }
 }
 
 function doPost(e) {
   try {
-    requireSetup_();
+    ensureAuthSetup_();
     const input = parseRequest_(e);
 
     switch (String(input.action || '').toLowerCase()) {
@@ -381,10 +381,24 @@ function decodeBase64Url_(value) {
   return Utilities.base64DecodeWebSafe(value + padding);
 }
 
-function requireSetup_() {
-  const properties = PropertiesService.getScriptProperties();
-  if (!properties.getProperty('PASSWORD_PEPPER') || !properties.getProperty('TOKEN_SECRET')) {
-    throw new Error('setupAuth를 먼저 실행하세요.');
+function ensureAuthSetup_() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+
+  try {
+    const spreadsheet = SpreadsheetApp.openById(AUTH_CONFIG.spreadsheetId);
+    ensureSheet_(spreadsheet, AUTH_CONFIG.usersSheet, USER_HEADERS);
+    ensureSheet_(spreadsheet, AUTH_CONFIG.sessionsSheet, SESSION_HEADERS);
+
+    const properties = PropertiesService.getScriptProperties();
+    if (!properties.getProperty('PASSWORD_PEPPER')) {
+      properties.setProperty('PASSWORD_PEPPER', randomSecret_());
+    }
+    if (!properties.getProperty('TOKEN_SECRET')) {
+      properties.setProperty('TOKEN_SECRET', randomSecret_());
+    }
+  } finally {
+    lock.releaseLock();
   }
 }
 
