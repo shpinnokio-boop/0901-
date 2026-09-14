@@ -1,15 +1,20 @@
 (function () {
   'use strict';
 
-  const API_URL = 'https://script.google.com/macros/s/AKfycbz7imb9Bu3DFRRfAQWOk83YgxjU-Q1eukC15EKtvp3gkrz-BtqC4HMtkk-usKML55ccxQ/exec';
+  const API_URL = '/api/auth';
   const TOKEN_KEY = 'blogAuthToken';
   const USER_KEY = 'blogAuthUser';
 
   async function request(action, values) {
-    const body = new URLSearchParams({ action, ...values });
-    const response = await fetch(API_URL, { method: 'POST', body });
-    if (!response.ok) throw new Error('서버에 연결할 수 없습니다.');
-    return response.json();
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...values }),
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(data?.message || '서버에 연결할 수 없습니다.');
+    return data;
   }
 
   function readSession() {
@@ -63,6 +68,7 @@
       const result = await request('login', {
         email: form.elements.email.value.trim(),
         password: form.elements.password.value,
+        remember: Boolean(form.elements.remember.checked),
       });
       if (!result.ok) throw new Error(result.message || '로그인하지 못했습니다.');
       saveSession(result.token, result.user, Boolean(form.elements.remember.checked));

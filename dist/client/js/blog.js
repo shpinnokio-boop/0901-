@@ -3,12 +3,22 @@
 
   const API = '/api/posts';
   const DRAFT_KEY = 'blogPostDraft';
+  const TOKEN_KEY = 'blogAuthToken';
+
+  function authToken() {
+    return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || '';
+  }
 
   async function request(path, options) {
+    const token = authToken();
     const response = await fetch(API + path, {
       credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
       ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+        ...(options?.headers || {}),
+      },
     });
     const data = response.status === 204 ? null : await response.json().catch(() => null);
     if (!response.ok) throw new Error(data?.message || '요청을 처리하지 못했습니다.');

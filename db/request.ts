@@ -1,3 +1,5 @@
+import { verify } from './auth';
+
 export class HttpError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
@@ -5,7 +7,16 @@ export class HttpError extends Error {
 export type AuthenticatedUser = { id: string; email: string; name: string };
 export type PostInput = { title: string; category: string; tags: string[]; content: string };
 
-export function getAuthenticatedUser(request: Request): AuthenticatedUser {
+export async function getAuthenticatedUser(request: Request): Promise<AuthenticatedUser> {
+  const authorization = request.headers.get('authorization') || '';
+  if (authorization.startsWith('Bearer ')) {
+    try {
+      const user = await verify(authorization.slice(7).trim());
+      return { id: user.userId, email: user.email, name: user.name };
+    } catch {
+      // A stale browser token should not hide a valid Sites login below.
+    }
+  }
   const email = (request.headers.get('oai-authenticated-user-email') || '').trim().toLowerCase();
   const platformId = request.headers.get('oai-authenticated-user-id');
   // Some authenticated Sites requests currently provide the account email but

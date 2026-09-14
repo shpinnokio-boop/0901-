@@ -1,1 +1,0 @@
-import{c as e,i as t,o as n,s as r,t as i}from"./posts-DF64H607.js";async function a(e){try{let n=new URL(e.url).searchParams.get(`mine`)===`1`?r(e):null;return Response.json({posts:await t(n?.id)})}catch(e){return n(e)}}async function o(t){try{let n=r(t),a=e(await t.json());return Response.json({post:await i(n,a)},{status:201})}catch(e){return n(e)}}export{a as GET,o as POST};

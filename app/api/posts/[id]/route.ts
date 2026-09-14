@@ -10,7 +10,7 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
-    const user = getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser(request);
     const post = await updatePost((await context.params).id, user.id, parsePostInput(await request.json()));
     return Response.json({ post });
   } catch (error) { return errorResponse(error); }
@@ -18,7 +18,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
 export async function DELETE(request: Request, context: RouteContext) {
   try {
-    const user = getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser(request);
     await deletePost((await context.params).id, user.id);
     return new Response(null, { status: 204 });
   } catch (error) { return errorResponse(error); }
