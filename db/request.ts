@@ -6,8 +6,12 @@ export type AuthenticatedUser = { id: string; email: string; name: string };
 export type PostInput = { title: string; category: string; tags: string[]; content: string };
 
 export function getAuthenticatedUser(request: Request): AuthenticatedUser {
-  const id = request.headers.get('oai-authenticated-user-id');
-  const email = request.headers.get('oai-authenticated-user-email') || '';
+  const email = (request.headers.get('oai-authenticated-user-email') || '').trim().toLowerCase();
+  const platformId = request.headers.get('oai-authenticated-user-id');
+  // Some authenticated Sites requests currently provide the account email but
+  // omit the stable user-id header. The dispatcher owns these headers, so the
+  // normalized email is a safe, deterministic fallback for post ownership.
+  const id = platformId || (email ? `email:${email}` : '');
   if (!id) throw new HttpError(401, '글을 관리하려면 로그인이 필요합니다.');
   let name = email || '작성자';
   if (request.headers.get('oai-authenticated-user-full-name-encoding') === 'percent-encoded-utf-8') {
