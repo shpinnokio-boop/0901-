@@ -25,3 +25,10 @@ if (!document.querySelector('script[src$="js/auth.js"]')) {
   authScript.defer = true;
   document.head.appendChild(authScript);
 }
+
+if (!document.querySelector('script[src$="js/blog.js"]')) {
+  const blogScript = document.createElement('script');
+  blogScript.src = 'js/blog.js';
+  blogScript.defer = true;
+  document.head.appendChild(blogScript);
+}
